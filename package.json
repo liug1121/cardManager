@@ -8,14 +8,17 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "core-js": "^3.4.4",
     "element-china-area-data": "^4.1.2",
     "element-ui": "^2.13.0",
     "file-saver": "^2.0.2",
     "lib-flexible": "^0.3.2",
+    "mapvgl": "^1.0.0-beta.127",
     "qrcode": "^1.4.4",
     "vue": "^2.6.10",
+    "vue-baidu-map": "^0.21.22",
+    "vue-bmap-gl": "0.0.17",
     "vue-json-excel": "^0.2.98",
     "vue-qr": "^2.3.0",
     "vue-resource": "^1.5.1",
@@ -32,7 +35,9 @@
     "eslint": "^5.16.0",
     "eslint-plugin-vue": "^5.0.0",
     "koa2-cors": "^2.0.6",
+    "node-sass": "^4.14.1",
     "px2rem-loader": "^0.1.9",
+    "sass-loader": "^7.3.1",
     "script-loader": "^0.7.2",
     "terser-webpack-plugin": "^2.3.2",
     "vue-template-compiler": "^2.6.10"
