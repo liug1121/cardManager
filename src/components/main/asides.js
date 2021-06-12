@@ -89,6 +89,12 @@ export default {
           title: '黑名单卡',
           path: '/blackCardList',
           type: 0
+        },
+        {
+          icon: 'el-icon-s-help',
+          title: '卡位置监控',
+          path: '/Positionscan',
+          type: 0
         }
       ]
     },

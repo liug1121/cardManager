@@ -181,9 +181,9 @@ const router = new Router({
           meta: { title: '黑名单卡组明细' },
         },
         {
-          path: '/blackCardDetails',
-          name: '黑名单卡明细',
-          component: (resolve) => require(['components/dataMonitoring/blackCard/blackCardDetails.vue'], resolve),
+          path: '/Positionscan',
+          name: '位置监控',
+          component: (resolve) => require(['components/dataMonitoring/positionscan/main.vue'], resolve),
           meta: { title: '黑名单卡明细' },
         }
       ]

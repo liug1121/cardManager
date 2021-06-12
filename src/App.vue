@@ -93,7 +93,7 @@ export default {
 <style>
 html,
 body,
-#app,
+#app 
 .el-container {
   /*设置内部填充为0，几个布局元素之间没有间距*/
   padding: 0px;
@@ -101,6 +101,7 @@ body,
   margin: 0px;
   /*统一设置高度为100%*/
   height: 100%;
+  
 }
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif, PingFangSC-Medium;
