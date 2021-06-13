@@ -6,6 +6,7 @@ import axios from 'axios'
 
 if (process.env.VUE_APP_CURRENTMODE == 'production') {
   axios.defaults.baseURL = 'http://xbk.tdj.cn/admin/'
+  // axios.defaults.baseURL = 'http://localhost:8888/boss/v1.0'
 } else if (process.env.VUE_APP_CURRENTMODE == 'test') {
   // axios.defaults.baseURL = "https://suning1-dev.xuebaka.cn/api"
 }
