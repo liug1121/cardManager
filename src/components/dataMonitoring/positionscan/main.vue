@@ -32,10 +32,16 @@
                 <!-- v-for="(staticsData,index) in staticsDatas" :key="index" -->
                 <!-- :scroll-wheel-zoom="true" -->
                 <!-- animation="BMAP_ANIMATION_BOUNCE" -->
-               <baidu-map center="陕西" :zoom="mapZoom"  class="bm-view" ak="rCAAQCyHBVNql3q409XlwT6FPP2kx2OF" >
+               <baidu-map v-if="mapLevel == 0" center="陕西" :zoom="mapZoom"  class="bm-view" ak="rCAAQCyHBVNql3q409XlwT6FPP2kx2OF" >
                     <bm-marker v-for="(staticsData,index) in staticsDatas" :key="index" :position="{lng: staticsData.cityLongitude, lat: staticsData.cityLatitude}" :dragging="true"
                     @click="markerClick(staticsData)" >
                         <bm-label :content="staticsData.num" :labelStyle="{color: 'red', fontSize : '12px'}" :offset="{width: -35, height: 30}"/>
+                    </bm-marker>
+               </baidu-map>
+               <!-- {"iccid":"89860619050066513689","lbsTime":"2021-06-13 05:31:05","address":"黑龙江省哈尔滨市呼兰区","cityId":4535,"cityName":null,"phone":"1064656676368","latitude":"45.88899","longitude":"126.58796"} -->
+               <baidu-map v-if="mapLevel == 1" :center="centerCity" :zoom="mapZoom"  class="bm-view" ak="rCAAQCyHBVNql3q409XlwT6FPP2kx2OF" >
+                    <bm-marker v-for="(staticsDetail,index) in staticsDetails" :key="index" :position="{lng: staticsDetail.longitude, lat: staticsDetail.latitude}" :dragging="true" @click="showIccid(staticsDetail.iccid)">
+                        <bm-label :content="staticsDetail.address" :labelStyle="{color: 'red', fontSize : '12px'}" :offset="{width: -35, height: 30}"/>
                     </bm-marker>
                </baidu-map>
             </div>
@@ -70,8 +76,9 @@ export default {
       channelId:-1,
       lbsStartDate:'',
       lbsEndDate:'',
-
-      mapZoom:5
+      mapZoom:5,
+      mapLevel:0,
+      centerCity:''
     };
   },
   created(){
@@ -93,23 +100,39 @@ export default {
     
   },
   methods: {
+    showIccid:function(iccid){
+        alert('iccid:' + iccid)
+    },
     markerClick:function(staticsData){
         console.log('markerClick clicked')
+        this.mapLevel = 1
+        this.mapZoom = 6
+    //     private Integer channelId;
+	// private Integer cityId;
+	// private String startDate;
+    // private String endDate;
+        let resq = {}
+        resq.cityId = staticsData.cityId
+        resq.channelId = this.channelId
+        resq.startDate = '2021-06-14 00:00:00'
+        resq.endDate = '2021-06-14 23:59:59'
+        API.apiChannelLbsDetails(resq).then(res => {
+            if(res.resultCode == 0){
+                console.log(JSON.stringify(res))
+                this.staticsDetails = res.data
+                this.centerCity = res.resultInfo
+            }
+        })
     },
     channelSelectId (channelSelectId) {
       this.channelId = channelSelectId
-
+      this.mapLevel = 0
+      this.mapZoom = 5
       let resq = {}
       resq.channelId = this.channelId
-      resq.startDate = '2021-06-13 00:00:00'
-      resq.endDate = '2021-06-13 23:59:59'
-
-// private Integer channelId;
-// 	private String startDate;
-// 	private String endDate;
-
+      resq.startDate = '2021-06-14 00:00:00'
+      resq.endDate = '2021-06-14 23:59:59'
       API.apiChannelLbsInfo(resq).then(res => {
-        //   console.log(JSON.stringify(res))
         if(res.resultCode == 0){
             this.staticsDatas = res.data
             console.log(JSON.stringify(this.staticsDatas))
@@ -117,28 +140,6 @@ export default {
             this.$message.error(res.resultInfo)
         }
       })
-    //   let staticsData={}
-    //   staticsData.provinceName = '江苏省'
-    //   staticsData.provinceId = -1
-    //   staticsData.cityName = '南京市'
-    //   staticsData.cityId = -1
-    //   staticsData.num = 10
-    //   staticsData.channelId = -1
-    //   staticsData.channelName = ''
-    //   staticsData.startDate = ''
-    //   staticsData.endDate = ''
-    //   this.staticsDatas.push(staticsData)
-    //   staticsData={}
-    //   staticsData.provinceName = '海南省'
-    //   staticsData.provinceId = -1
-    //   staticsData.cityName = '海口市'
-    //   staticsData.cityId = -1
-    //   staticsData.num = 4
-    //   staticsData.channelId = -1
-    //   staticsData.channelName = ''
-    //   staticsData.startDate = ''
-    //   staticsData.endDate = ''
-    //   this.staticsDatas.push(staticsData)
     },
     handler ({BMap, map}) {
       console.log(BMap, map)
