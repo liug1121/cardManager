@@ -21,7 +21,18 @@
                     <div @click="okForChannel">确  定</div>
                 </div>
                 <div class="opt-control-input" v-if="buttonIndex==1">导入input</div>
-                <div class="opt-control-input" v-if="buttonIndex==2">单卡input</div>
+                <div class="opt-control-input" v-if="buttonIndex==2">
+                    <input v-model="iccid">
+                    <div class="date">
+                        <el-date-picker v-model="lbsIccidStartDate" class="date-sel" type="date" placeholder="开始日期" value-format="yyyy-MM-dd" @change="startIccidTimeChange">
+                        </el-date-picker>
+                    </div>
+                    <div class="date">
+                        <el-date-picker v-model="lbsIccidEndDate" class="date-sel"  type="date" placeholder="结束日期" value-format="yyyy-MM-dd" @change="endIccidTimeChange">
+                        </el-date-picker>
+                    </div>
+                    <div @click="okForIccid">确  定</div>
+                </div>
                 <div class="opt-control-input" v-if="buttonIndex==3">
                     <el-form :inline="true" >
                         <el-form-item label="省份" class="queryFormItem">
@@ -109,6 +120,9 @@ export default {
       lbsEndDate:'',
       lbsAreaStartDate:'',
       lbsAreaEndDate:'',
+      iccid:'',
+      lbsIccidStartDate:'',
+      lbsIccidEndDate:'',
       mapZoom:5,
       mapLevel:0,
       centerCity:'',
@@ -191,6 +205,22 @@ export default {
 	// private String endDate;
         // apiAreaLbsInfo
     },
+    okForIccid : function(){
+       this.mapLevel = 1
+        this.mapZoom = 6
+        let resq = {}
+        resq.iccid = this.iccid
+        resq.startDate = this.lbsIccidStartDate
+        resq.endDate = this.lbsIccidEndDate
+        API.apiIccidLbsInfo(resq).then(res => {
+            if(res.resultCode == 0){
+                this.staticsDetails = res.data
+                this.centerCity = res.resultInfo
+            }else{
+                this.$message.error(res.resultInfo)
+            }
+        })
+    }, 
     okForChannel:function(){
         let resq = {}
         resq.channelId = this.channelId
@@ -216,6 +246,12 @@ export default {
     },
     endAreaTimeChange () {
       this.lbsAreaEndDate = `${this.lbsAreaEndDate} 23:59:59`
+    },
+    startIccidTimeChange () {
+      this.lbsIccidStartDate = `${this.lbsIccidStartDate} 00:00:00`
+    },
+    endIccidTimeChange () {
+      this.lbsIccidEndDate = `${this.lbsIccidEndDate} 23:59:59`
     },
     showIccid:function(iccid){
         alert('iccid:' + iccid)
