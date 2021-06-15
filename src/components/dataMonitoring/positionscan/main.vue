@@ -10,14 +10,45 @@
                 </div>
                 <div class="opt-control-input" v-if="buttonIndex==0">
                     <channelSelect :multiple="false" style="width:120px !important" @channelSelectId="channelSelectId"></channelSelect>
+                    <div class="date">
+                        <el-date-picker v-model="lbsStartDate" class="date-sel" type="date" placeholder="开始日期" value-format="yyyy-MM-dd" @change="startTimeChange">
+                        </el-date-picker>
+                    </div>
+                    <div class="date">
+                        <el-date-picker v-model="lbsEndDate" class="date-sel"  type="date" placeholder="结束日期" value-format="yyyy-MM-dd" @change="endTimeChange">
+                        </el-date-picker>
+                    </div>
+                    <div @click="okForChannel">确  定</div>
                 </div>
                 <div class="opt-control-input" v-if="buttonIndex==1">导入input</div>
                 <div class="opt-control-input" v-if="buttonIndex==2">单卡input</div>
-                <div class="opt-control-input" v-if="buttonIndex==3">位置input</div>
+                <div class="opt-control-input" v-if="buttonIndex==3">
+                    <el-form :inline="true" >
+                        <el-form-item label="省份" class="queryFormItem">
+                            <el-select class="queryFormInput" v-model="provinceId"  clearable filterable placeholder="请选择省份" @change="provinceChange">
+                                <el-option v-for="item in provinceOptions" :key="item.provinceId" :label="item.provinceName" :value="item.provinceId"></el-option>
+                            </el-select>
+                        </el-form-item>
+                        <el-form-item label="城市" class="queryFormItem">
+                            <el-select class="queryFormInput" v-model="cityId"  clearable filterable placeholder="请选择城市名">
+                                <el-option v-for="item in PoisCitiesList" :key="item.id" :label="item.name" :value="item.id"></el-option>
+                            </el-select>
+                        </el-form-item>
+                    </el-form>
+                    <div class="date">
+                        <el-date-picker v-model="lbsAreaStartDate" class="date-sel" type="date" placeholder="开始日期" value-format="yyyy-MM-dd" @change="startAreaTimeChange">
+                        </el-date-picker>
+                    </div>
+                    <div class="date">
+                        <el-date-picker v-model="lbsAreaEndDate" class="date-sel"  type="date" placeholder="结束日期" value-format="yyyy-MM-dd" @change="endAreaTimeChange">
+                        </el-date-picker>
+                    </div>
+                    <div @click="okForPosition">确  定</div>
+                </div>
             </div>
-            <div class="opt-list">
+            <!-- <div class="opt-list">
                     <cardinfos message ="template组件之Template标签"></cardinfos>
-            </div>
+            </div> -->
         </div>
         <div class="map">
             <div class="map-menu">
@@ -76,12 +107,19 @@ export default {
       channelId:-1,
       lbsStartDate:'',
       lbsEndDate:'',
+      lbsAreaStartDate:'',
+      lbsAreaEndDate:'',
       mapZoom:5,
       mapLevel:0,
-      centerCity:''
+      centerCity:'',
+      PoisCitiesList:[],
+      provinceOptions:[],
+      provinceId:'',
+      cityId:''
     };
   },
   created(){
+      this.getprovinceOptions()
     //   let resq = {}
     //   resq.channelId = 26
     //   resq.startDate = '2021-06-13 00:00:00'
@@ -100,6 +138,85 @@ export default {
     
   },
   methods: {
+    provinceChange (vId) {
+      let obj = {};
+      obj = this.provinceOptions.find((item) => { // 这里的userList就是上面遍历的数据源
+        return item.provinceId === vId; // 筛选出匹配数据
+      });
+      // console.log(obj.provinceId);
+      // console.log(obj.provinceName); // 这边的name就是对应label
+      this.getPoisCitiesList(obj.provinceId)
+    },
+    getPoisCitiesList (provinceId) {
+      const data = {
+        provinceId: provinceId
+      }
+      API.apiPoisCitiesList(data).then(res => {
+        if (res.resultCode === 0) {
+          this.PoisCitiesList = res.data
+          console.log(this.PoisCitiesList);
+        } else {
+          this.$message.error(res.resultInfo)
+        }
+      })
+    },
+    getprovinceOptions () {
+      API.apiProvincesList().then(res => {
+        if (res.resultCode === 0) {
+          this.provinceOptions = res.data
+          const provinceId = this.provinceOptions[0].provinceId
+          this.getPoisCitiesList(provinceId)
+        } else {
+          this.$message.error(res.resultInfo)
+        }
+      })
+    },
+    okForPosition:function(){
+        let resq = {}
+        resq.provinceId = this.provinceId
+        resq.cityId = this.cityId
+        resq.startDate = this.lbsAreaStartDate
+        resq.endDate = this.lbsAreaEndDate
+         API.apiAreaLbsInfo(resq).then(res => {
+             if(res.resultCode == 0){
+                this.staticsDatas = res.data
+                console.log(JSON.stringify(this.staticsDatas))
+            }else{
+                this.$message.error(res.resultInfo)
+            }
+         });
+    //     private Integer provinceId;
+	// private Integer cityId;
+	// private String startDate;
+	// private String endDate;
+        // apiAreaLbsInfo
+    },
+    okForChannel:function(){
+        let resq = {}
+        resq.channelId = this.channelId
+        resq.startDate = this.lbsStartDate
+        resq.endDate = this.lbsEndDate
+        API.apiChannelLbsInfo(resq).then(res => {
+            if(res.resultCode == 0){
+                this.staticsDatas = res.data
+                console.log(JSON.stringify(this.staticsDatas))
+            }else{
+                this.$message.error(res.resultInfo)
+            }
+        })
+    },
+    startTimeChange () {
+      this.lbsStartDate = `${this.lbsStartDate} 00:00:00`
+    },
+    endTimeChange () {
+      this.lbsEndDate = `${this.lbsEndDate} 23:59:59`
+    },
+    startAreaTimeChange () {
+      this.lbsAreaStartDate = `${this.lbsAreaStartDate} 00:00:00`
+    },
+    endAreaTimeChange () {
+      this.lbsAreaEndDate = `${this.lbsAreaEndDate} 23:59:59`
+    },
     showIccid:function(iccid){
         alert('iccid:' + iccid)
     },
@@ -107,15 +224,19 @@ export default {
         console.log('markerClick clicked')
         this.mapLevel = 1
         this.mapZoom = 6
-    //     private Integer channelId;
-	// private Integer cityId;
-	// private String startDate;
-    // private String endDate;
         let resq = {}
         resq.cityId = staticsData.cityId
-        resq.channelId = this.channelId
-        resq.startDate = '2021-06-14 00:00:00'
-        resq.endDate = '2021-06-14 23:59:59'
+        if(this.channelId != -1){
+            resq.channelId = this.channelId
+        }  
+        if(this.buttonIndex==0){
+            resq.startDate = this.lbsStartDate
+            resq.endDate = this.lbsEndDate
+        }else if(this.buttonIndex == 3){
+            resq.startDate = this.lbsAreaStartDate
+            resq.endDate = this.lbsAreaEndDate
+        }
+        
         API.apiChannelLbsDetails(resq).then(res => {
             if(res.resultCode == 0){
                 console.log(JSON.stringify(res))
@@ -128,18 +249,6 @@ export default {
       this.channelId = channelSelectId
       this.mapLevel = 0
       this.mapZoom = 5
-      let resq = {}
-      resq.channelId = this.channelId
-      resq.startDate = '2021-06-14 00:00:00'
-      resq.endDate = '2021-06-14 23:59:59'
-      API.apiChannelLbsInfo(resq).then(res => {
-        if(res.resultCode == 0){
-            this.staticsDatas = res.data
-            console.log(JSON.stringify(this.staticsDatas))
-        }else{
-            this.$message.error(res.resultInfo)
-        }
-      })
     },
     handler ({BMap, map}) {
       console.log(BMap, map)
@@ -233,5 +342,16 @@ export default {
   height: 900px;
   margin: 20px;
   margin-left: 10%;
+}
+.date{
+    margin-left: 10px;
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+.date-sel{
+    width:150px;
+    height: 10px;
+    font-size: 10px;
+    
 }
 </style>

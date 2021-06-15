@@ -59,6 +59,9 @@ export default {
   apiChannelLbsDetails: params =>{
     return API.POST('boss/v1.0/channels/lbs/details', params)
   },
+  apiAreaLbsInfo: params =>{
+    return API.POST('boss/v1.0/lbs/area', params)
+  },
   // 黑名单卡明细导出
   apiLbsGroupCardDownload: (groupId, iccid) => {
     const groupId1 = groupId
