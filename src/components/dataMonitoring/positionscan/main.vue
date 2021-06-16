@@ -85,6 +85,7 @@
                     <bm-marker v-for="(staticsDetail,index) in staticsDetails" :key="index" :position="{lng: staticsDetail.longitude, lat: staticsDetail.latitude}" :dragging="true" @click="showIccid(staticsDetail.iccid)">
                         <bm-label :content="staticsDetail.address" :labelStyle="{color: 'red', fontSize : '12px'}" :offset="{width: -35, height: 30}"/>
                     </bm-marker>
+                    <bm-polyline :path="polylinePath" stroke-color="blue" :stroke-opacity="0.5" :stroke-weight="2" :editing="false" @lineupdate="updatePolylinePath"></bm-polyline>
                </baidu-map>
             </div>
         </div>
@@ -92,7 +93,7 @@
 </template>
 
 <script>
-import { BaiduMap,BmMarker,BmLabel} from 'vue-baidu-map';
+import { BaiduMap,BmMarker,BmLabel,BmPolyline} from 'vue-baidu-map';
 import cardinfos from "./list.vue"
 import channelSelect from './../../sale/channelSelect'
 import API from 'api/dataMoniting'
@@ -102,6 +103,7 @@ export default {
       BaiduMap,
       BmMarker,
       BmLabel,
+      BmPolyline,
       channelSelect
       
   },
@@ -129,7 +131,8 @@ export default {
       PoisCitiesList:[],
       provinceOptions:[],
       provinceId:'',
-      cityId:''
+      cityId:'',
+      polylinePath:[]
     };
   },
   created(){
@@ -149,9 +152,13 @@ export default {
     //   })
   },
   mounted () {
-    
+
   },
   methods: {
+    updatePolylinePath (e) {
+        console.log('sdsdsds  updatePolylinePath')
+      this.polylinePath = e.target.getPath()
+    },
     provinceChange (vId) {
       let obj = {};
       obj = this.provinceOptions.find((item) => { // 这里的userList就是上面遍历的数据源
@@ -216,6 +223,26 @@ export default {
             if(res.resultCode == 0){
                 this.staticsDetails = res.data
                 this.centerCity = res.resultInfo
+                for(let i = 0; i < this.staticsDetails.length;i++){
+                    let onePoint = {}
+                    onePoint.lng = this.staticsDetails[i].longitude
+                    onePoint.lat = this.staticsDetails[i].latitude
+                    this.polylinePath.push(onePoint)
+    //                 private String iccid;
+	// private String lbsTime;
+	// private String address;
+	// private Integer cityId;
+	// private String cityName;
+	// private String phone;
+	// private String latitude;
+	// private String longitude;
+                }
+
+                //   polylinePath: [
+    //     {lng: 116.404, lat: 39.915},
+    //     {lng: 116.405, lat: 39.920},
+    //     {lng: 116.423493, lat: 39.907445}
+    //   ]
             }else{
                 this.$message.error(res.resultInfo)
             }
