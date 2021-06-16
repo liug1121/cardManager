@@ -80,7 +80,6 @@
                         <bm-label :content="staticsData.num" :labelStyle="{color: 'red', fontSize : '12px'}" :offset="{width: -35, height: 30}"/>
                     </bm-marker>
                </baidu-map>
-               <!-- {"iccid":"89860619050066513689","lbsTime":"2021-06-13 05:31:05","address":"黑龙江省哈尔滨市呼兰区","cityId":4535,"cityName":null,"phone":"1064656676368","latitude":"45.88899","longitude":"126.58796"} -->
                <baidu-map v-if="mapLevel == 1" :center="centerCity" :zoom="mapZoom"  class="bm-view" ak="rCAAQCyHBVNql3q409XlwT6FPP2kx2OF" >
                     <bm-marker v-for="(staticsDetail,index) in staticsDetails" :key="index" :position="{lng: staticsDetail.longitude, lat: staticsDetail.latitude}" :dragging="true" @click="showIccid(staticsDetail.iccid)">
                         <bm-label :content="staticsDetail.address" :labelStyle="{color: 'red', fontSize : '12px'}" :offset="{width: -35, height: 30}"/>
